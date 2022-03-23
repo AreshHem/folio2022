@@ -1,13 +1,172 @@
 ---
-title: "Storyboard Commentary"
+title: "Computational Musicology"
+author: 'Aresh Hemayat'
+date:   'April 2022'
 output: 
   flexdashboard::flex_dashboard:
     storyboard: true
+    orientation: columns
+    vertical_layout: fill
+    theme: bootstrap
+    
 ---
+
+
+
+```{r, include=FALSE}
+library(flexdashboard)
+library(tidyverse)
+library(spotifyr)
+library(compmus)
+library(unix)
+library(plotly)
+library(RColorBrewer)
+library(ggthemes)
+library(viridis)
+```
+
+
+<!-- playlists --> 
+
+```{r, include = FALSE}
+fruitvale <- get_playlist_audio_features("", "23n37IlJukKL9pUJyBbSib")
+creed <- get_playlist_audio_features("", "7jA12g7812CnId8erPPhUo")
+everything <- get_playlist_audio_features("", "7AT5LLcwYqISVLfLaaoQQo")
+panther <- get_playlist_audio_features("", "0iPhN83fKPIjBpG8vdZfLq")
+wish <- get_playlist_audio_features("", "5a9ptUGZg5aZmGqbrgpmbw")
+venom <- get_playlist_audio_features("", "5Gtki6gbXEqXY8q0AYo8Ck")
+creed2 <- get_playlist_audio_features("", "36L2OTBzMVmY72fLKzSaRo")
+slice <- get_playlist_audio_features("", "398opLV7fDeiTRk7d6ulHv")
+tenet <- get_playlist_audio_features("", "7EXL4cAtGhd0Qaumzx96rq")
+```
+
+
+
+<!-- Titles for each scores --> 
+
+```{r, include=FALSE}
+scores <-
+  bind_rows(
+    fruitvale %>% mutate(category = "(2013) Fruitvale Station "),
+    creed %>% mutate(category = "(2015) Creed"),
+    panther %>% mutate(category = "(2017) Black Panther"),
+    wish %>% mutate(category = "(2017) Death Wish "),
+    venom %>% mutate(category = "(2018) Venom"),
+    creed2 %>% mutate(category = "(2018) Creed II"),
+    tenet %>% mutate(category = "(2020) Tenet"),
+    slice %>% mutate(category = "(2018) Slice"),
+    everything %>% mutate(category = "(2017) Everything, Everything")
+  )
+
+```
+
+<!-- Genres --> 
+
+```{r, include=FALSE}
+genres <-
+  bind_rows(
+   
+      fruitvale %>% mutate(category = "Drama/Romance"),
+    creed %>% mutate(category = "Sport/Drama"),
+    panther %>% mutate(category = "Action"),
+    wish %>% mutate(category = "Action"),
+    venom %>% mutate(category = "Action"),
+    creed2 %>% mutate(category = "Sport/Drama"),
+    tenet %>% mutate(category = "Action"),
+    everything %>% mutate(category = "Drama/Romance")
+
+  )
+
+```
+
+<!-- Summary scores --> 
+
+```{r, include=FALSE}
+scores %>%
+  summarise(
+    mean_speechiness = mean(speechiness),
+    mean_acousticness = mean(acousticness),
+    mean_liveness = mean(liveness),
+    sd_speechiness = sd(speechiness),
+    sd_acousticness = sd(acousticness),
+    sd_liveness = sd(liveness),
+    median_speechiness = median(speechiness),
+    median_acousticness = median(acousticness),
+    median_liveness = median(liveness),
+    mad_speechiness = mad(speechiness),
+    mad_acousticness = mad(acousticness),
+    mad_liveness = mad(liveness)
+  )
+
+```
+
+<!-- Artist features --> 
+
+```{r, include = FALSE}
+ludwig <- get_artist_audio_features('Ludwig Göransson')
+
+```
+
+
+
+Analysis {.storyboard}
+=========================================
+
+### Main
+
+```{r, include=FALSE}
+lolli <-
+  bind_rows(
+   
+      fruitvale %>% mutate(category = "Drama/Romance"),
+    creed2 %>% mutate(category = "Sport/Drama"),
+    tenet %>% mutate(category = "Action"),
+    panther %>% mutate(category = "Action")
+    
+
+  )
+
+```
+
+
+```{r include = TRUE}
+lolli <- lolli %>% mutate(track.name = fct_reorder(track.name, acousticness, last))%>%
+ggplot(aes(x = `track.name`, y = `acousticness`, color = track.album.name)) + 
+  geom_point(stat='identity', fill="grey", size= 3) +
+  scale_size("track.popularity") +
+  geom_segment(aes(y = 0.5, 
+                   x = `track.name`, 
+                   yend = `acousticness`, 
+                   xend = `track.name`), 
+                   color = "orange",
+               alpha = 0.9
+               ) +
+  geom_text(color="white", size=2, label = "") +
+  labs(title="Comparing different scores", 
+       subtitle="Ludwig Göransson") + 
+  ylim(0, 1) +
+  coord_flip()+ scale_color_viridis(alpha = 1, begin = 0.01, end = 0.99, direction = 1,
+  discrete = TRUE, option = "viridis",
+) + theme_calc(base_family = "Liberation Serif")
+
+
+
+```
+
+```{r include = TRUE}
+ggplotly(lolli)
+```
+
+***
+A first step in improving the interpretation of a certain signal is to divide into building blocks more usable for the following processing steps. If these blocks consist of sinusoidal functions, a method of this kind is often referred to as the Fourier analysis. Sinusoidal functions are particular since they have an explicit physical significance with regard to frequency. The subsequent decomposition then unfolds the frequency range of a signal, like a mirror that can be used to divide light into its spectral constituent colours. The Fourier transforms a signal dependent on time into a frequency representation. As one of the main instruments in signal processing, we are going to meet a number of music processing activities with the Fourier transformation system.
+
+Again looking at acousticness, you'll see a significant difference between Fruitvale station (Romance) and Tenet (Action). I used this chart to pick out certain tracks that will be analysed on a deeper level later on. 
+
 
 ### Frame 1
 
-```{r}
+```{r setup, incude=FALSE}
+
 ```
 
 *** 
